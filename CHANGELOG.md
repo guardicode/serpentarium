@@ -15,3 +15,9 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 - pre-commit hooks
 - pyproject.toml
 - dependencies with poetry
+- Plugin
+- AbstractPlugin
+- MultiprocessingPlugin
+- PluginLoader
+- Event concurrency Protocol
+- Lock concurrency Protocol
