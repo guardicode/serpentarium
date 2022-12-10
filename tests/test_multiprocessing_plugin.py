@@ -98,3 +98,16 @@ def test_return_None():
     return_value = plugin.run()
 
     assert return_value is None
+
+
+class ExceptionPlugin(AbstractPlugin):
+    def run(self, **_):
+        raise Exception()
+
+
+def test_plugin_raises_exception():
+    plugin = MultiprocessingPlugin(plugin=ExceptionPlugin(plugin_name="test"))
+
+    return_value = plugin.run()
+
+    assert return_value is None

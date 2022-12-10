@@ -80,7 +80,7 @@ class MultiprocessingPlugin(AbstractPlugin):
             except EOFError as err:
                 logger.error(f"Error retrieving the return value for {self.name}: {err}")
         else:
-            logger.debug(f"{self.name} did not return a value")
+            logger.error(f"{self.name} did not return a value")
 
     @property
     def return_value(self) -> Any:
