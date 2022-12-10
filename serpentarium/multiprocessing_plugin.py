@@ -64,6 +64,9 @@ class MultiprocessingPlugin(AbstractPlugin):
         self._retrieve_return_value()
 
     def is_alive(self) -> bool:
+        if self._proc is None:
+            return False
+
         return self._proc.is_alive()
 
     def _retrieve_return_value(self):
