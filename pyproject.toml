@@ -33,7 +33,7 @@ description = "A Python framework for running plugins with conflicting dependenc
 authors = ["Mike Salvatore <mike.s.salvatore@gmail.com>"]
 license = "GPLv3"
 classifiers=[
-    "Development Status :: 2 - Alpha",
+    "Development Status :: 3 - Alpha",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.7",
