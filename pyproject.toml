@@ -14,3 +14,20 @@ ensure_newline_before_comments = true
 
 [tool.vulture]
 paths = ["serpentarium"]
+
+[tool.poetry]
+name = "serpentarium"
+version = "0.1.0"
+description = "A Python framework for running plugins with conflicting dependencies"
+authors = ["Mike Salvatore <mike.s.salvatore@gmail.com>"]
+license = "GPLv3"
+classifiers=[
+    "Development Status :: 2 - Alpha",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Software Development",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+repository = "https://github.com/guardicode/serpentarium"
+readme = "README.md"
