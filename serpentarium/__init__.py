@@ -7,4 +7,5 @@ CLEAN_SYS_MODULES = sys.modules.copy()
 from . import concurrency
 from .plugin import Plugin
 from .abstract_plugin import AbstractPlugin
+from .multiprocessing_plugin import MultiprocessingPlugin
 from .plugin_loader import PluginLoader
