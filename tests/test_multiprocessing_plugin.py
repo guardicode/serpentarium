@@ -1,4 +1,5 @@
 import multiprocessing
+import threading
 
 import pytest
 
@@ -111,3 +112,19 @@ def test_plugin_raises_exception():
     return_value = plugin.run()
 
     assert return_value is None
+
+
+class MainThreadNamePlugin(AbstractPlugin):
+    def run(self, **_):
+        return threading.current_thread().name
+
+
+def test_main_thread_name_set():
+    plugin_thread_name = "Sesame"
+    plugin = MultiprocessingPlugin(
+        plugin=MainThreadNamePlugin(plugin_name="test"), main_thread_name=plugin_thread_name
+    )
+
+    return_value = plugin.run()
+
+    assert return_value == plugin_thread_name
