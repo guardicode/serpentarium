@@ -78,3 +78,10 @@ def test_is_alive__process_not_started():
     plugin = MultiprocessingPlugin(plugin=MyPlugin("plugin1", value=0))
 
     assert not plugin.is_alive()
+
+
+def test_join__process_not_started():
+    plugin = MultiprocessingPlugin(plugin=MyPlugin("plugin1", value=0))
+
+    with pytest.raises(AssertionError):
+        assert not plugin.join()

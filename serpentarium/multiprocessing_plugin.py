@@ -55,6 +55,9 @@ class MultiprocessingPlugin(AbstractPlugin):
         self._sender.send(return_value)
 
     def join(self, timeout=None):
+        if self._proc is None:
+            raise AssertionError("can only join a started plugin")
+
         self._proc.join(timeout)
         if self.is_alive():
             return
