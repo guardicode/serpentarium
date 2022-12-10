@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from . import Plugin
+from . import MultiprocessingPlugin, Plugin
+from .nop import NOP
 from .plugin_wrapper import PluginWrapper
 
 
@@ -26,5 +27,26 @@ class PluginLoader:
         return PluginWrapper(
             plugin_name=plugin_name,
             plugin_directory=self._plugin_directory / plugin_name,
+            **kwargs,
+        )
+
+    def load_multiprocessing_plugin(
+        self,
+        *,
+        plugin_name: str,
+        main_thread_name: str = "MainThread",
+        configure_logging=NOP,
+        **kwargs,
+    ) -> MultiprocessingPlugin:
+        plugin = PluginWrapper(
+            plugin_name=plugin_name,
+            plugin_directory=self._plugin_directory / plugin_name,
+            **kwargs,
+        )
+
+        return MultiprocessingPlugin(
+            plugin=plugin,
+            main_thread_name=main_thread_name,
+            configure_logging=configure_logging,
             **kwargs,
         )
