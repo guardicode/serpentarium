@@ -85,3 +85,16 @@ def test_join__process_not_started():
 
     with pytest.raises(AssertionError):
         assert not plugin.join()
+
+
+class NoReturnPlugin(AbstractPlugin):
+    def run(self, **_):
+        pass
+
+
+def test_return_None():
+    plugin = MultiprocessingPlugin(plugin=NoReturnPlugin(plugin_name="test"))
+
+    return_value = plugin.run()
+
+    assert return_value is None
