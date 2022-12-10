@@ -31,3 +31,6 @@ classifiers=[
 ]
 repository = "https://github.com/guardicode/serpentarium"
 readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
