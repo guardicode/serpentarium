@@ -5,12 +5,9 @@ from typing import Any, Optional
 
 from . import AbstractPlugin, Plugin
 from .constants import SERPENTARIUM
+from .nop import NOP
 
 logger = logging.getLogger(SERPENTARIUM)
-
-
-def NOP():
-    pass
 
 
 class MultiprocessingPlugin(AbstractPlugin):
