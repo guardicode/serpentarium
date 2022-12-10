@@ -4,6 +4,7 @@ import sys
 
 CLEAN_SYS_MODULES = sys.modules.copy()
 
+from . import concurrency
 from .plugin import Plugin
 from .abstract_plugin import AbstractPlugin
 from .plugin_loader import PluginLoader
