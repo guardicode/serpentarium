@@ -8,11 +8,11 @@ PLUGIN_DIR = Path(__file__).parent / "plugins"
 
 
 @pytest.fixture
-def plugin_loader():
+def plugin_loader() -> PluginLoader:
     return PluginLoader(PLUGIN_DIR)
 
 
-def test_plugin_isolation(plugin_loader):
+def test_plugin_isolation(plugin_loader: PluginLoader):
     plugin1 = plugin_loader.load(plugin_name="plugin1")
     plugin2 = plugin_loader.load(plugin_name="plugin2")
 
@@ -24,7 +24,7 @@ def test_plugin_isolation(plugin_loader):
     assert "Tweedledum" in plugin2.run()
 
 
-def test_module_not_found_incorrect_plugin_name(plugin_loader):
+def test_module_not_found_incorrect_plugin_name(plugin_loader: PluginLoader):
     with pytest.raises(ModuleNotFoundError):
         plugin = plugin_loader.load(plugin_name="NONEXISTANT")
         plugin.run()
