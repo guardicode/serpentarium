@@ -10,6 +10,9 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 ### Added
 - py.typed
 
+### Fixed
+- The Alpha status classifier
+
 ## [v0.1.0] - 2022-12-10
 ### Added
 - README.md
