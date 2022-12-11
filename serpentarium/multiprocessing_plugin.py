@@ -11,6 +11,10 @@ logger = logging.getLogger(SERPENTARIUM)
 
 
 class MultiprocessingPlugin(AbstractPlugin):
+    """
+    A plugin that runs concurrently in a separate process
+    """
+
     def __init__(
         self,
         *,
@@ -20,6 +24,13 @@ class MultiprocessingPlugin(AbstractPlugin):
         configure_logging=NOP,
         **kwargs,
     ):
+        """
+        :param plugin: A Plugin to run in a separate process
+        :param main_thread_name: The name of the process's main thread, defaults to "MainThread"
+        :param daemon: Whether or not the process should be a daemon process
+        :param configure_logging: A callable that will be run on the child process to configure
+                                  concurrent logging
+        """
         super().__init__(plugin_name=plugin.name)
         self._plugin = plugin
         self._main_thread_name = main_thread_name
@@ -33,7 +44,7 @@ class MultiprocessingPlugin(AbstractPlugin):
         self._return_value = None
 
     def run(self, *, timeout: Optional[float] = None, **kwargs) -> Any:
-        # TODO: run() can only be called once, which breaks the Liskov Substitution Principle.
+        # TODO: run() can only be called once, which   breaks the Liskov Substitution Principle.
         self.start(**kwargs)
         self.join(timeout)
 
