@@ -1,7 +1,7 @@
 import logging
 import multiprocessing
 from threading import current_thread
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from . import AbstractPlugin, Plugin
 from .constants import SERPENTARIUM
@@ -19,9 +19,9 @@ class MultiprocessingPlugin(AbstractPlugin):
         self,
         *,
         plugin: Plugin,
-        main_thread_name="MainThread",
-        daemon=False,
-        configure_logging=NOP,
+        main_thread_name: str = "MainThread",
+        daemon: bool = False,
+        configure_logging: Callable[[], None] = NOP,
         **kwargs,
     ):
         """
@@ -63,7 +63,7 @@ class MultiprocessingPlugin(AbstractPlugin):
         return_value = self._plugin.run(**kwargs)
         self._sender.send(return_value)
 
-    def join(self, timeout=None):
+    def join(self, timeout: Optional[float] = None):
         if self._proc is None:
             raise AssertionError("can only join a started plugin")
 
