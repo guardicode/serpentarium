@@ -33,6 +33,7 @@ class MultiprocessingPlugin(AbstractPlugin):
         self._return_value = None
 
     def run(self, *, timeout: Optional[float] = None, **kwargs) -> Any:
+        # TODO: run() can only be called once, which breaks the Liskov Substitution Principle.
         self.start(**kwargs)
         self.join(timeout)
 
