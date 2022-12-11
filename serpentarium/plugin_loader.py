@@ -35,7 +35,7 @@ class PluginLoader:
         *,
         plugin_name: str,
         main_thread_name: str = "MainThread",
-        configure_logging=NOP,
+        configure_child_process_logger=NOP,
         **kwargs,
     ) -> MultiprocessingPlugin:
         plugin = PluginWrapper(
@@ -47,6 +47,6 @@ class PluginLoader:
         return MultiprocessingPlugin(
             plugin=plugin,
             main_thread_name=main_thread_name,
-            configure_logging=configure_logging,
+            configure_child_process_logger=configure_child_process_logger,
             **kwargs,
         )

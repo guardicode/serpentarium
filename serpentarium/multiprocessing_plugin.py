@@ -21,21 +21,21 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         plugin: SingleUsePlugin,
         main_thread_name: str = "MainThread",
         daemon: bool = False,
-        configure_logging: Callable[[], None] = NOP,
+        configure_child_process_logger: Callable[[], None] = NOP,
         **kwargs,
     ):
         """
         :param plugin: A Plugin to run in a separate process
         :param main_thread_name: The name of the process's main thread, defaults to "MainThread"
         :param daemon: Whether or not the process should be a daemon process
-        :param configure_logging: A callable that will be run on the child process to configure
-                                  concurrent logging
+        :param configure_child_process_logger: A callable that will be run on the child process to
+                                               confirgure concurrent logging
         """
         super().__init__(plugin_name=plugin.name)
         self._plugin = plugin
         self._main_thread_name = main_thread_name
         self._daemon = daemon
-        self._configure_logging = configure_logging
+        self._configure_child_process_logger = configure_child_process_logger
 
         self._multiprocessing_context = multiprocessing.get_context("spawn")
         self._receiver, self._sender = multiprocessing.Pipe(duplex=False)
@@ -57,7 +57,7 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
 
     def _run(self, **kwargs):
         current_thread().name = self._main_thread_name
-        self._configure_logging()
+        self._configure_child_process_logger()
 
         return_value = self._plugin.run(**kwargs)
         self._sender.send(return_value)
