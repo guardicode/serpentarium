@@ -29,34 +29,34 @@ def log_messages(messages_to_log: Iterable[Tuple[int, str]]):
 
 def test_child_process_logger__level_notset():
     spawn_context = multiprocessing.get_context("spawn")
-    queue = spawn_context.Queue()
-    configure_logging_fn = partial(configure_child_process_logger, queue)
+    ipc_queue = spawn_context.Queue()
+    configure_logging_fn = partial(configure_child_process_logger, ipc_queue)
 
     proc = spawn_context.Process(target=run, args=(configure_logging_fn, LOG_MESSAGES))
     proc.start()
     proc.join(0.15)
 
-    assert not queue.empty()
-    assert queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert queue.empty()
+    assert not ipc_queue.empty()
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
+    assert ipc_queue.empty()
 
 
 def test_child_process_logger__level_warning():
     spawn_context = multiprocessing.get_context("spawn")
-    queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, queue, logging.WARNING)
+    ipc_queue = spawn_context.Queue()
+    configure_logger_fn = partial(configure_child_process_logger, ipc_queue, logging.WARNING)
 
     proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
     proc.start()
     proc.join(0.15)
 
-    assert not queue.empty()
-    assert queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert queue.empty()
+    assert not ipc_queue.empty()
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
+    assert ipc_queue.empty()
 
 
 def test_configure_queue_listener():

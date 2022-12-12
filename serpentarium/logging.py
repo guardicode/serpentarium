@@ -12,7 +12,7 @@ from queue import Queue
 from typing import Sequence
 
 
-def configure_child_process_logger(logger_queue: Queue, level: int = logging.NOTSET):
+def configure_child_process_logger(ipc_queue: Queue, level: int = logging.NOTSET):
     """
     Configures a child process to send all log messages to a queue
 
@@ -21,12 +21,12 @@ def configure_child_process_logger(logger_queue: Queue, level: int = logging.NOT
     Additionally, the only filtering performed is based on log level. By default, all log messages
     are pushed to the queue.
 
-    :param logger_queue: A Queue object shared between the plugin and the queue servicing process
+    :param ipc_queue: A Queue object shared between the plugin and the queue servicing process
     :param level: The minimum log level of statements to push to the queue; messages below this log
                   level will be dropped, defaults to logging.NOTSET
     """
     root = logging.getLogger()
-    root.addHandler(QueueHandler(logger_queue))
+    root.addHandler(QueueHandler(ipc_queue))
     root.setLevel(level)
 
 
