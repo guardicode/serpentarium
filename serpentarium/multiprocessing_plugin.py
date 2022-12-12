@@ -3,14 +3,14 @@ import multiprocessing
 from threading import current_thread
 from typing import Any, Callable, Optional
 
-from . import AbstractPlugin, SingleUsePlugin
+from . import NamedPluginMixin, SingleUsePlugin
 from .constants import SERPENTARIUM
 from .nop import NOP
 
 logger = logging.getLogger(SERPENTARIUM)
 
 
-class MultiprocessingPlugin(AbstractPlugin, SingleUsePlugin):
+class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
     """
     A plugin that runs concurrently in a separate process
     """

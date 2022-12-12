@@ -5,11 +5,11 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, Dict, Optional
 
-from . import CLEAN_SYS_MODULES, AbstractPlugin, MultiUsePlugin
+from . import CLEAN_SYS_MODULES, MultiUsePlugin, NamedPluginMixin
 from .constants import VENDOR_DIRECTORY_NAME
 
 
-class PluginWrapper(AbstractPlugin, MultiUsePlugin):
+class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
     """
     Wraps a Plugin to make loading and import system manipulation transparent
 
