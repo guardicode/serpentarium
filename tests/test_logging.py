@@ -41,9 +41,9 @@ def test_child_process_logger__level_notset():
 def test_child_process_logger__level_warning():
     spawn_context = multiprocessing.get_context("spawn")
     queue = spawn_context.Queue()
-    configure_logging_fn = partial(configure_child_process_logger, queue, logging.WARNING)
+    configure_logger_fn = partial(configure_child_process_logger, queue, logging.WARNING)
 
-    proc = spawn_context.Process(target=run, args=(configure_logging_fn, LOG_MESSAGES))
+    proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
     proc.start()
     proc.join(0.15)
 
