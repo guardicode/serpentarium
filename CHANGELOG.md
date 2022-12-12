@@ -9,9 +9,11 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 ## [v0.2.0]
 ### Added
 - py.typed
+- serpentarium.logging
 
 ### Changed
 - AbstractPlugin to NamedPluginMixin
+- MultiprocesingPlugin's configure_logging parameter to configure_child_process_logger
 
 ### Fixed
 - The Alpha status classifier

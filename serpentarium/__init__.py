@@ -5,6 +5,7 @@ import sys
 CLEAN_SYS_MODULES = sys.modules.copy()
 
 from . import concurrency
+from . import logging
 from .plugin import SingleUsePlugin, MultiUsePlugin
 from .named_plugin_mixin import NamedPluginMixin
 from .multiprocessing_plugin import MultiprocessingPlugin
