@@ -10,6 +10,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 ### Added
 - py.typed
 - serpentarium.logging
+- Missing docstrings in MultiprocessingPlugin
 
 ### Changed
 - AbstractPlugin to NamedPluginMixin

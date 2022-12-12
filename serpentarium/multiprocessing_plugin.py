@@ -44,12 +44,25 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         self._return_value = None
 
     def run(self, *, timeout: Optional[float] = None, **kwargs) -> Any:
+        """
+        Run a plugin with the provided keyword arguments and returns the result
+
+        When the timeout argument is not present or None, the operation will block until the
+        plugin stops.
+
+        :param: A floating-point number of seconds to wait for the plugin to run
+
+        :return: The data that the plugin returned
+        """
         self.start(**kwargs)
         self.join(timeout)
 
         return self.return_value
 
     def start(self, **kwargs):
+        """
+        Launch a new process that runs this plugin
+        """
         self._proc = self._multiprocessing_context.Process(
             name=self.name, daemon=self._daemon, target=self._run, kwargs=kwargs
         )
@@ -63,6 +76,14 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         self._sender.send(return_value)
 
     def join(self, timeout: Optional[float] = None):
+        """
+        Wait for this plugin and its parent process to exit
+
+        When the timeout argument is not present or None, the operation will block until the
+        plugin stops.
+
+        :param: A floating-point number of seconds to wait for the plugin to run
+        """
         if self._proc is None:
             raise AssertionError("can only join a started plugin")
 
@@ -75,6 +96,11 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         self._retrieve_return_value()
 
     def is_alive(self) -> bool:
+        """
+        Return whether the plugin is alive (process is still running)
+
+        :return: True if the process/plugin is running. False otherwise.
+        """
         if self._proc is None:
             return False
 
