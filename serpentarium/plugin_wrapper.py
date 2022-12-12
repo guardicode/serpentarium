@@ -5,11 +5,11 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, Dict, Optional
 
-from . import CLEAN_SYS_MODULES, AbstractPlugin, Plugin
+from . import CLEAN_SYS_MODULES, MultiUsePlugin, NamedPluginMixin
 from .constants import VENDOR_DIRECTORY_NAME
 
 
-class PluginWrapper(AbstractPlugin):
+class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
     """
     Wraps a Plugin to make loading and import system manipulation transparent
 
@@ -23,7 +23,7 @@ class PluginWrapper(AbstractPlugin):
 
         self._plugin_directory = plugin_directory
         self._vendor_directory = self._plugin_directory / VENDOR_DIRECTORY_NAME
-        self.plugin: Optional[Plugin] = None
+        self.plugin: Optional[MultiUsePlugin] = None
 
         self._constructor_kwargs = kwargs
 
@@ -46,10 +46,9 @@ class PluginWrapper(AbstractPlugin):
         4. yield
         5. Restore the state of the import system.
         """
-
         host_process_sys_modules = sys.modules.copy()
+
         PluginWrapper._set_sys_modules(CLEAN_SYS_MODULES)
-        # TODO: It's probably cleaner to use a custom meta path finder instead of adding to sys.path
         sys.path = [str(self._plugin_directory.parent), str(self._vendor_directory), *sys.path]
 
         yield
@@ -64,6 +63,6 @@ class PluginWrapper(AbstractPlugin):
         sys.modules.clear()
         sys.modules.update(modules)
 
-    def _load_plugin(self) -> Plugin:
+    def _load_plugin(self) -> MultiUsePlugin:
         plugin_class = importlib.import_module(f"{self.name}.plugin").Plugin
         return plugin_class(plugin_name=self.name, **self._constructor_kwargs)

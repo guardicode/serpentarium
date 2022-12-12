@@ -5,6 +5,10 @@ A Python framework for running plugins with conflicting dependencies
 
 Coming soon!
 
+## Installation
+
+`pip install serpentarium`
+
 ## Caveats
 
 - This package is highly experimental

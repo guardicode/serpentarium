@@ -28,12 +28,12 @@ paths = ["serpentarium"]
 
 [tool.poetry]
 name = "serpentarium"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Python framework for running plugins with conflicting dependencies"
 authors = ["Mike Salvatore <mike.s.salvatore@gmail.com>"]
 license = "GPLv3"
 classifiers=[
-    "Development Status :: 2 - Alpha",
+    "Development Status :: 3 - Alpha",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.7",
@@ -45,6 +45,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
+typing-extensions = "^4.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

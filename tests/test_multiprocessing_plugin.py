@@ -3,10 +3,16 @@ import threading
 
 import pytest
 
-from serpentarium import AbstractPlugin, MultiprocessingPlugin, concurrency
+from serpentarium import (
+    MultiprocessingPlugin,
+    MultiUsePlugin,
+    NamedPluginMixin,
+    SingleUsePlugin,
+    concurrency,
+)
 
 
-class MyPlugin(AbstractPlugin):
+class MyPlugin(NamedPluginMixin, MultiUsePlugin):
     def __init__(self, plugin_name: str, value: int):
         super().__init__(plugin_name=plugin_name)
         self._value = value
@@ -33,7 +39,7 @@ def test_multiprocessing_plugin_return_value():
 BLOCKING_PLUGIN_RETURN_VALUE = 1000  # miles
 
 
-class BlockingPlugin(AbstractPlugin):
+class BlockingPlugin(NamedPluginMixin, SingleUsePlugin):
     def __init__(self, plugin_name: str, interrupt: concurrency.Event):
         super().__init__(plugin_name=plugin_name)
         self._interrupt = interrupt
@@ -88,7 +94,7 @@ def test_join__process_not_started():
         assert not plugin.join()
 
 
-class NoReturnPlugin(AbstractPlugin):
+class NoReturnPlugin(NamedPluginMixin, MultiUsePlugin):
     def run(self, **_):
         pass
 
@@ -101,7 +107,7 @@ def test_return_None():
     assert return_value is None
 
 
-class ExceptionPlugin(AbstractPlugin):
+class ExceptionPlugin(NamedPluginMixin, MultiUsePlugin):
     def run(self, **_):
         raise Exception()
 
@@ -114,7 +120,7 @@ def test_plugin_raises_exception():
     assert return_value is None
 
 
-class MainThreadNamePlugin(AbstractPlugin):
+class MainThreadNamePlugin(NamedPluginMixin, MultiUsePlugin):
     def run(self, **_):
         return threading.current_thread().name
 
