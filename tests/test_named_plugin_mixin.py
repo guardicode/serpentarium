@@ -1,7 +1,7 @@
-from serpentarium import AbstractPlugin
+from serpentarium import MultiUsePlugin, NamedPluginMixin
 
 
-class MyPlugin(AbstractPlugin):
+class MyPlugin(NamedPluginMixin, MultiUsePlugin):
     def run(self):
         pass
 

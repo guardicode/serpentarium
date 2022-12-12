@@ -3,14 +3,14 @@ import multiprocessing
 from threading import current_thread
 from typing import Any, Callable, Optional
 
-from . import AbstractPlugin, Plugin
+from . import NamedPluginMixin, SingleUsePlugin
 from .constants import SERPENTARIUM
 from .nop import NOP
 
 logger = logging.getLogger(SERPENTARIUM)
 
 
-class MultiprocessingPlugin(AbstractPlugin):
+class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
     """
     A plugin that runs concurrently in a separate process
     """
@@ -18,7 +18,7 @@ class MultiprocessingPlugin(AbstractPlugin):
     def __init__(
         self,
         *,
-        plugin: Plugin,
+        plugin: SingleUsePlugin,
         main_thread_name: str = "MainThread",
         daemon: bool = False,
         configure_logging: Callable[[], None] = NOP,
@@ -44,7 +44,6 @@ class MultiprocessingPlugin(AbstractPlugin):
         self._return_value = None
 
     def run(self, *, timeout: Optional[float] = None, **kwargs) -> Any:
-        # TODO: run() can only be called once, which   breaks the Liskov Substitution Principle.
         self.start(**kwargs)
         self.join(timeout)
 
