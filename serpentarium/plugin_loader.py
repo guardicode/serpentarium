@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from . import MultiprocessingPlugin, Plugin
+from . import MultiprocessingPlugin, MultiUsePlugin
 from .nop import NOP
 from .plugin_wrapper import PluginWrapper
 
@@ -16,7 +16,7 @@ class PluginLoader:
         """
         self._plugin_directory = plugin_directory
 
-    def load(self, *, plugin_name: str, **kwargs) -> Plugin:
+    def load(self, *, plugin_name: str, **kwargs) -> MultiUsePlugin:
         """
         Load a plugin by name
 
