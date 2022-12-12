@@ -5,11 +5,11 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, Dict, Optional
 
-from . import CLEAN_SYS_MODULES, AbstractPlugin, Plugin
+from . import CLEAN_SYS_MODULES, AbstractPlugin, MultiUsePlugin
 from .constants import VENDOR_DIRECTORY_NAME
 
 
-class PluginWrapper(AbstractPlugin):
+class PluginWrapper(AbstractPlugin, MultiUsePlugin):
     """
     Wraps a Plugin to make loading and import system manipulation transparent
 
@@ -23,7 +23,7 @@ class PluginWrapper(AbstractPlugin):
 
         self._plugin_directory = plugin_directory
         self._vendor_directory = self._plugin_directory / VENDOR_DIRECTORY_NAME
-        self.plugin: Optional[Plugin] = None
+        self.plugin: Optional[MultiUsePlugin] = None
 
         self._constructor_kwargs = kwargs
 
@@ -64,6 +64,6 @@ class PluginWrapper(AbstractPlugin):
         sys.modules.clear()
         sys.modules.update(modules)
 
-    def _load_plugin(self) -> Plugin:
+    def _load_plugin(self) -> MultiUsePlugin:
         plugin_class = importlib.import_module(f"{self.name}.plugin").Plugin
         return plugin_class(plugin_name=self.name, **self._constructor_kwargs)
