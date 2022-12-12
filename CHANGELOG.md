@@ -9,6 +9,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 ## [v0.2.0]
 ### Added
 - py.typed
+- serpentarium.logging
 
 ### Changed
 - AbstractPlugin to NamedPluginMixin
