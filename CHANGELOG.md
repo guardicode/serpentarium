@@ -15,6 +15,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
 ### Fixed
 - The Alpha status classifier
+- MultiprocessingPlugin's violation of the Liskov Substitution Principle
 
 ## [v0.1.0] - 2022-12-10
 ### Added
