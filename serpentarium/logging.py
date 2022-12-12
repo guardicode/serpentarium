@@ -7,8 +7,9 @@ to a queue which is serviced by a single process.
 """
 
 import logging
-from logging.handlers import QueueHandler
+from logging.handlers import QueueHandler, QueueListener
 from queue import Queue
+from typing import Sequence
 
 
 def configure_child_process_logger(logger_queue: Queue, level: int = logging.NOTSET):
@@ -27,3 +28,31 @@ def configure_child_process_logger(logger_queue: Queue, level: int = logging.NOT
     root = logging.getLogger()
     root.addHandler(QueueHandler(logger_queue))
     root.setLevel(level)
+
+
+def configure_host_process_logger(
+    ipc_queue: Queue,
+    handlers: Sequence[logging.handlers.QueueHandler] = [],
+) -> QueueListener:
+    """
+    Configures the root logger to use a QueueListener
+
+    A QueueListener can be used to process the log messages from a child process. This function
+    configures a QueueListener to use the provided `ipc_queue` and handlers. It configures the root
+    logger to push log messages from the host process into the `ipc_queue`. Finally, it returns the
+    QueueListener.
+
+    Note that you will need to call `QueueListener.start()`, otherwise the log messages will not be
+    processed. See https://docs.python.org/3/library/logging.handlers.html#queuelistener for more
+    information about QueueListener
+
+    :param ipc_queue: A Queue shared by the host and child process that stores log messages
+    :param handlers: A Sequence of LogHandler objects that the QueueListener will use to handle log
+                     messages it pulls off of the ipc_queue
+
+    :return: An unstarted QueueListener object
+    """
+    root = logging.getLogger()
+    root.addHandler(logging.handlers.QueueHandler(ipc_queue))
+
+    return QueueListener(ipc_queue, *handlers, respect_handler_level=True)
