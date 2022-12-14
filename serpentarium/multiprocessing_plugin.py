@@ -1,11 +1,12 @@
 import logging
 import multiprocessing
 from threading import current_thread
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from . import NamedPluginMixin, SingleUsePlugin
 from .constants import SERPENTARIUM
 from .nop import NOP
+from .types import ConfigureLoggerCallback as ConfigureLoggerCallback
 
 logger = logging.getLogger(SERPENTARIUM)
 
@@ -21,7 +22,7 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         plugin: SingleUsePlugin,
         main_thread_name: str = "MainThread",
         daemon: bool = False,
-        configure_child_process_logger: Callable[[], None] = NOP,
+        configure_child_process_logger: ConfigureLoggerCallback = NOP,
         **kwargs,
     ):
         """

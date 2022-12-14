@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Optional
 
 from . import MultiprocessingPlugin, MultiUsePlugin
 from .nop import NOP
 from .plugin_wrapper import PluginWrapper
+from .types import ConfigureLoggerCallback as ConfigureLoggerCallback
 
 
 class PluginLoader:
@@ -12,7 +13,7 @@ class PluginLoader:
     """
 
     def __init__(
-        self, plugin_directory: Path, configure_child_process_logger: Callable[[], None] = NOP
+        self, plugin_directory: Path, configure_child_process_logger: ConfigureLoggerCallback = NOP
     ):
         """
         :param plugin_directory: The directory where plugins are stored
@@ -43,7 +44,7 @@ class PluginLoader:
         *,
         plugin_name: str,
         main_thread_name: str = "MainThread",
-        configure_child_process_logger: Optional[Callable[[], None]] = None,
+        configure_child_process_logger: Optional[ConfigureLoggerCallback] = None,
         **kwargs,
     ) -> MultiprocessingPlugin:
         plugin = PluginWrapper(
