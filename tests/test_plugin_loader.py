@@ -1,8 +1,12 @@
+import logging
+import multiprocessing
+from functools import partial
 from pathlib import Path
 
 import pytest
 
 from serpentarium import PluginLoader
+from serpentarium.logging import configure_child_process_logger
 
 PLUGIN_DIR = Path(__file__).parent / "plugins"
 MY_PARAM = "test_param"
@@ -62,3 +66,49 @@ def test_multiprocessing_plugin_isolation(plugin_loader: PluginLoader):
 
     assert "Tweedledee" in plugin1.run()
     assert "Tweedledum" in plugin2.run()
+
+
+LOG_MESSAGES = [
+    (logging.DEBUG, "log1"),
+    (logging.INFO, "log2"),
+    (logging.WARNING, "log3"),
+]
+
+
+def test_child_process_logger_configuration():
+    spawn_context = multiprocessing.get_context("spawn")
+    ipc_queue = spawn_context.Queue()
+    configure_logger_fn = partial(configure_child_process_logger, ipc_queue)
+    plugin_loader = PluginLoader(PLUGIN_DIR, configure_logger_fn)
+
+    plugin = plugin_loader.load_multiprocessing_plugin(plugin_name="logger")
+    plugin.run(log_messages=LOG_MESSAGES)
+
+    assert not ipc_queue.empty()
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
+    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
+    assert ipc_queue.empty()
+
+
+def test_child_process_logger_configuration__override():
+    spawn_context = multiprocessing.get_context("spawn")
+
+    default_ipc_queue = spawn_context.Queue()
+    default_configure_logger_fn = partial(configure_child_process_logger, default_ipc_queue)
+    plugin_loader = PluginLoader(PLUGIN_DIR, default_configure_logger_fn)
+
+    override_ipc_queue = spawn_context.Queue()
+    override_configure_logger_fn = partial(configure_child_process_logger, override_ipc_queue)
+
+    plugin = plugin_loader.load_multiprocessing_plugin(
+        plugin_name="logger", configure_child_process_logger=override_configure_logger_fn
+    )
+    plugin.run(log_messages=LOG_MESSAGES)
+
+    assert default_ipc_queue.empty()
+    assert not override_ipc_queue.empty()
+    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
+    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
+    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
+    assert override_ipc_queue.empty()

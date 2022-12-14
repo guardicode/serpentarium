@@ -3,9 +3,10 @@ import logging.handlers
 import multiprocessing
 from functools import partial
 from queue import Queue
-from typing import Callable, Iterable, Tuple
+from typing import Iterable, Tuple
 
 from serpentarium.logging import configure_child_process_logger, configure_host_process_logger
+from serpentarium.types import ConfigureLoggerCallback as ConfigureLoggerCallback
 
 LOG_MESSAGES = [
     (logging.DEBUG, "log1"),
@@ -15,7 +16,7 @@ LOG_MESSAGES = [
 ]
 
 
-def run(configure_logger: Callable[[], None], messages_to_log: Iterable[Tuple[int, str]]):
+def run(configure_logger: ConfigureLoggerCallback, messages_to_log: Iterable[Tuple[int, str]]):
     configure_logger()
     log_messages(messages_to_log)
 
