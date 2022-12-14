@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Callable, Optional
 
 from . import MultiprocessingPlugin, MultiUsePlugin
 from .nop import NOP
@@ -10,11 +11,18 @@ class PluginLoader:
     Loads plugins from the provided plugin directory
     """
 
-    def __init__(self, plugin_directory: Path):
+    def __init__(
+        self, plugin_directory: Path, configure_child_process_logger: Callable[[], None] = NOP
+    ):
         """
         :param plugin_directory: The directory where plugins are stored
+        :param configure_child_process_logger: A callback to configure logging that will be run
+                                               by any MultiprocessingPlugin that this object loads.
+                                               This can be overridden on each call to
+                                               load_multiprocessing_plugin(). Defaults to a NOP.
         """
         self._plugin_directory = plugin_directory
+        self._configure_child_process_logger = configure_child_process_logger
 
     def load(self, *, plugin_name: str, **kwargs) -> MultiUsePlugin:
         """
@@ -35,7 +43,7 @@ class PluginLoader:
         *,
         plugin_name: str,
         main_thread_name: str = "MainThread",
-        configure_child_process_logger=NOP,
+        configure_child_process_logger: Optional[Callable[[], None]] = None,
         **kwargs,
     ) -> MultiprocessingPlugin:
         plugin = PluginWrapper(
@@ -44,9 +52,14 @@ class PluginLoader:
             **kwargs,
         )
 
+        if configure_child_process_logger is None:
+            configure_logger_fn = self._configure_child_process_logger
+        else:
+            configure_logger_fn = configure_child_process_logger
+
         return MultiprocessingPlugin(
             plugin=plugin,
             main_thread_name=main_thread_name,
-            configure_child_process_logger=configure_child_process_logger,
+            configure_child_process_logger=configure_logger_fn,
             **kwargs,
         )
