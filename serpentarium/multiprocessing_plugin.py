@@ -107,14 +107,22 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         return self._proc.is_alive()
 
     def _retrieve_return_value(self):
-        if self._receiver.poll():
-            try:
-                self._return_value = self._receiver.recv()
-                logger.debug(f"{self.name} returned: {self.return_value}")
-            except EOFError as err:
-                logger.error(f"Error retrieving the return value for {self.name}: {err}")
-        else:
-            logger.error(f"{self.name} did not return a value")
+        try:
+            if self._receiver.poll():
+                self._return_value = self._read_return_value()
+            else:
+                logger.error(f"{self.name} did not return a value")
+        finally:
+            logger.debug(f"Closing Pipe to {self.name}")
+            self._receiver.close()
+            logger.debug(f"Pipe to {self.name} closed")
+
+    def _read_return_value(self) -> Any:
+        try:
+            return self._receiver.recv()
+            logger.debug(f"{self.name} returned: {self.return_value}")
+        except EOFError as err:
+            logger.error(f"Error retrieving the return value for {self.name}: {err}")
 
     @property
     def return_value(self) -> Any:
