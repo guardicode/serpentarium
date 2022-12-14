@@ -1,12 +1,10 @@
 import logging
-import multiprocessing
-from functools import partial
 from pathlib import Path
 
 import pytest
 
 from serpentarium import PluginLoader
-from serpentarium.logging import configure_child_process_logger
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 
 PLUGIN_DIR = Path(__file__).parent / "plugins"
 MY_PARAM = "test_param"
@@ -76,30 +74,20 @@ LOG_MESSAGES = [
 
 
 def test_child_process_logger_configuration():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue)
+    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
     plugin_loader = PluginLoader(PLUGIN_DIR, configure_logger_fn)
 
     plugin = plugin_loader.load_multiprocessing_plugin(plugin_name="logger")
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
 
 
 def test_child_process_logger_configuration__override():
-    spawn_context = multiprocessing.get_context("spawn")
-
-    default_ipc_queue = spawn_context.Queue()
-    default_configure_logger_fn = partial(configure_child_process_logger, default_ipc_queue)
+    _, default_ipc_queue, default_configure_logger_fn = get_logger_config_callback()
     plugin_loader = PluginLoader(PLUGIN_DIR, default_configure_logger_fn)
 
-    override_ipc_queue = spawn_context.Queue()
-    override_configure_logger_fn = partial(configure_child_process_logger, override_ipc_queue)
+    _, override_ipc_queue, override_configure_logger_fn = get_logger_config_callback()
 
     plugin = plugin_loader.load_multiprocessing_plugin(
         plugin_name="logger", configure_child_process_logger=override_configure_logger_fn
@@ -107,8 +95,4 @@ def test_child_process_logger_configuration__override():
     plugin.run(log_messages=LOG_MESSAGES)
 
     assert default_ipc_queue.empty()
-    assert not override_ipc_queue.empty()
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert override_ipc_queue.empty()
+    assert_queue_equals(override_ipc_queue, LOG_MESSAGES)

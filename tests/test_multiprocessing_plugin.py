@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
 import threading
-from functools import partial
 
 import pytest
 
@@ -12,14 +11,8 @@ from serpentarium import (
     SingleUsePlugin,
     concurrency,
 )
-from serpentarium.logging import configure_child_process_logger
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 from tests.plugins.logger.plugin import Plugin as LoggerPlugin
-
-LOG_MESSAGES = [
-    (logging.DEBUG, "log1"),
-    (logging.INFO, "log2"),
-    (logging.WARNING, "log3"),
-]
 
 
 class MyPlugin(NamedPluginMixin, MultiUsePlugin):
@@ -147,10 +140,15 @@ def test_main_thread_name_set():
     assert return_value == plugin_thread_name
 
 
+LOG_MESSAGES = [
+    (logging.DEBUG, "log1"),
+    (logging.INFO, "log2"),
+    (logging.WARNING, "log3"),
+]
+
+
 def test_child_process_logger_configuration():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue)
+    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
 
     plugin = MultiprocessingPlugin(
         plugin=LoggerPlugin(plugin_name="logger_test"),
@@ -159,8 +157,4 @@ def test_child_process_logger_configuration():
 
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
