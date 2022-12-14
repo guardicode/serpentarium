@@ -1,7 +1,6 @@
 import logging
 import multiprocessing
 import threading
-from functools import partial
 
 import pytest
 
@@ -12,7 +11,7 @@ from serpentarium import (
     SingleUsePlugin,
     concurrency,
 )
-from serpentarium.logging import configure_child_process_logger
+from tests.logging_utils import get_logger_config_callback
 from tests.plugins.logger.plugin import Plugin as LoggerPlugin
 
 LOG_MESSAGES = [
@@ -148,9 +147,7 @@ def test_main_thread_name_set():
 
 
 def test_child_process_logger_configuration():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue)
+    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
 
     plugin = MultiprocessingPlugin(
         plugin=LoggerPlugin(plugin_name="logger_test"),

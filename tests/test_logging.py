@@ -1,12 +1,11 @@
 import logging
 import logging.handlers
-import multiprocessing
-from functools import partial
 from queue import Queue
 from typing import Iterable, Tuple
 
-from serpentarium.logging import configure_child_process_logger, configure_host_process_logger
+from serpentarium.logging import configure_host_process_logger
 from serpentarium.types import ConfigureLoggerCallback as ConfigureLoggerCallback
+from tests.logging_utils import get_logger_config_callback
 
 LOG_MESSAGES = [
     (logging.DEBUG, "log1"),
@@ -29,9 +28,7 @@ def log_messages(messages_to_log: Iterable[Tuple[int, str]]):
 
 
 def test_child_process_logger__level_notset():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue)
+    spawn_context, ipc_queue, configure_logger_fn = get_logger_config_callback()
 
     proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
     proc.start()
@@ -46,9 +43,7 @@ def test_child_process_logger__level_notset():
 
 
 def test_child_process_logger__level_warning():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue, logging.WARNING)
+    spawn_context, ipc_queue, configure_logger_fn = get_logger_config_callback(logging.WARNING)
 
     proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
     proc.start()
