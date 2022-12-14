@@ -14,12 +14,6 @@ from serpentarium import (
 from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 from tests.plugins.logger.plugin import Plugin as LoggerPlugin
 
-LOG_MESSAGES = [
-    (logging.DEBUG, "log1"),
-    (logging.INFO, "log2"),
-    (logging.WARNING, "log3"),
-]
-
 
 class MyPlugin(NamedPluginMixin, MultiUsePlugin):
     def __init__(self, plugin_name: str, value: int):
@@ -144,6 +138,13 @@ def test_main_thread_name_set():
     return_value = plugin.run()
 
     assert return_value == plugin_thread_name
+
+
+LOG_MESSAGES = [
+    (logging.DEBUG, "log1"),
+    (logging.INFO, "log2"),
+    (logging.WARNING, "log3"),
+]
 
 
 def test_child_process_logger_configuration():
