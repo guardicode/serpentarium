@@ -19,6 +19,8 @@ Coming soon!
   you'll need to use a multiprocessing Context object with the "spawn" method
   to generate any Locks, Events, or other synchronization primitives that will
   be passed to a plugin.
+- SECURITY: This project loads and executes code from files. Do not load or run
+  plugins from untrusted sources.
 
 ## Development
 ### Pre-commit hooks

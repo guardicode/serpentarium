@@ -1,11 +1,12 @@
 import logging
 import multiprocessing
 from threading import current_thread
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from . import NamedPluginMixin, SingleUsePlugin
 from .constants import SERPENTARIUM
 from .nop import NOP
+from .types import ConfigureLoggerCallback as ConfigureLoggerCallback
 
 logger = logging.getLogger(SERPENTARIUM)
 
@@ -21,7 +22,7 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         plugin: SingleUsePlugin,
         main_thread_name: str = "MainThread",
         daemon: bool = False,
-        configure_child_process_logger: Callable[[], None] = NOP,
+        configure_child_process_logger: ConfigureLoggerCallback = NOP,
         **kwargs,
     ):
         """
@@ -107,15 +108,28 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         return self._proc.is_alive()
 
     def _retrieve_return_value(self):
-        if self._receiver.poll():
-            try:
-                self._return_value = self._receiver.recv()
-                logger.debug(f"{self.name} returned: {self.return_value}")
-            except EOFError as err:
-                logger.error(f"Error retrieving the return value for {self.name}: {err}")
-        else:
-            logger.error(f"{self.name} did not return a value")
+        try:
+            if self._receiver.poll():
+                self._return_value = self._read_return_value()
+            else:
+                logger.error(f"{self.name} did not return a value")
+        finally:
+            logger.debug(f"Closing Pipe to {self.name}")
+            self._receiver.close()
+            logger.debug(f"Pipe to {self.name} closed")
+
+    def _read_return_value(self) -> Any:
+        try:
+            return self._receiver.recv()
+            logger.debug(f"{self.name} returned: {self.return_value}")
+        except EOFError as err:
+            logger.error(f"Error retrieving the return value for {self.name}: {err}")
 
     @property
     def return_value(self) -> Any:
+        """
+        The return value of the plugin
+
+        This property will be `None` until the plugin finishes running.
+        """
         return self._return_value

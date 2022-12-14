@@ -1,11 +1,11 @@
 import logging
 import logging.handlers
-import multiprocessing
-from functools import partial
 from queue import Queue
-from typing import Callable, Iterable, Tuple
+from typing import Iterable, Tuple
 
-from serpentarium.logging import configure_child_process_logger, configure_host_process_logger
+from serpentarium.logging import configure_host_process_logger
+from serpentarium.types import ConfigureLoggerCallback as ConfigureLoggerCallback
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 
 LOG_MESSAGES = [
     (logging.DEBUG, "log1"),
@@ -15,7 +15,7 @@ LOG_MESSAGES = [
 ]
 
 
-def run(configure_logger: Callable[[], None], messages_to_log: Iterable[Tuple[int, str]]):
+def run(configure_logger: ConfigureLoggerCallback, messages_to_log: Iterable[Tuple[int, str]]):
     configure_logger()
     log_messages(messages_to_log)
 
@@ -28,35 +28,23 @@ def log_messages(messages_to_log: Iterable[Tuple[int, str]]):
 
 
 def test_child_process_logger__level_notset():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logging_fn = partial(configure_child_process_logger, ipc_queue)
-
-    proc = spawn_context.Process(target=run, args=(configure_logging_fn, LOG_MESSAGES))
-    proc.start()
-    proc.join(0.15)
-
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert ipc_queue.empty()
-
-
-def test_child_process_logger__level_warning():
-    spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue, logging.WARNING)
+    spawn_context, ipc_queue, configure_logger_fn = get_logger_config_callback()
 
     proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
     proc.start()
     proc.join(0.15)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
+
+
+def test_child_process_logger__level_warning():
+    spawn_context, ipc_queue, configure_logger_fn = get_logger_config_callback(logging.WARNING)
+
+    proc = spawn_context.Process(target=run, args=(configure_logger_fn, LOG_MESSAGES))
+    proc.start()
+    proc.join(0.15)
+
+    assert_queue_equals(ipc_queue, LOG_MESSAGES[2:])
 
 
 def test_configure_queue_listener():
@@ -75,8 +63,5 @@ def test_configure_queue_listener():
     finally:
         queue_listener.stop()
 
-        assert not test_queue.empty()
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-        assert test_queue.empty()
+    assert ipc_queue.empty()
+    assert_queue_equals(test_queue, LOG_MESSAGES[1:])

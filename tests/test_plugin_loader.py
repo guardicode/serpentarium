@@ -1,8 +1,10 @@
+import logging
 from pathlib import Path
 
 import pytest
 
 from serpentarium import PluginLoader
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 
 PLUGIN_DIR = Path(__file__).parent / "plugins"
 MY_PARAM = "test_param"
@@ -62,3 +64,35 @@ def test_multiprocessing_plugin_isolation(plugin_loader: PluginLoader):
 
     assert "Tweedledee" in plugin1.run()
     assert "Tweedledum" in plugin2.run()
+
+
+LOG_MESSAGES = [
+    (logging.DEBUG, "log1"),
+    (logging.INFO, "log2"),
+    (logging.WARNING, "log3"),
+]
+
+
+def test_child_process_logger_configuration():
+    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
+    plugin_loader = PluginLoader(PLUGIN_DIR, configure_logger_fn)
+
+    plugin = plugin_loader.load_multiprocessing_plugin(plugin_name="logger")
+    plugin.run(log_messages=LOG_MESSAGES)
+
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
+
+
+def test_child_process_logger_configuration__override():
+    _, default_ipc_queue, default_configure_logger_fn = get_logger_config_callback()
+    plugin_loader = PluginLoader(PLUGIN_DIR, default_configure_logger_fn)
+
+    _, override_ipc_queue, override_configure_logger_fn = get_logger_config_callback()
+
+    plugin = plugin_loader.load_multiprocessing_plugin(
+        plugin_name="logger", configure_child_process_logger=override_configure_logger_fn
+    )
+    plugin.run(log_messages=LOG_MESSAGES)
+
+    assert default_ipc_queue.empty()
+    assert_queue_equals(override_ipc_queue, LOG_MESSAGES)

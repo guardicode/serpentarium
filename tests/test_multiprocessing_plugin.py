@@ -1,3 +1,4 @@
+import logging
 import multiprocessing
 import threading
 
@@ -10,6 +11,8 @@ from serpentarium import (
     SingleUsePlugin,
     concurrency,
 )
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
+from tests.plugins.logger.plugin import Plugin as LoggerPlugin
 
 
 class MyPlugin(NamedPluginMixin, MultiUsePlugin):
@@ -79,6 +82,7 @@ def test_join_timeout(interrupt: concurrency.Event, blocking_plugin: Multiproces
 
     assert blocking_plugin.is_alive()
     interrupt.set()
+    blocking_plugin.join()
 
 
 def test_is_alive__process_not_started():
@@ -134,3 +138,23 @@ def test_main_thread_name_set():
     return_value = plugin.run()
 
     assert return_value == plugin_thread_name
+
+
+LOG_MESSAGES = [
+    (logging.DEBUG, "log1"),
+    (logging.INFO, "log2"),
+    (logging.WARNING, "log3"),
+]
+
+
+def test_child_process_logger_configuration():
+    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
+
+    plugin = MultiprocessingPlugin(
+        plugin=LoggerPlugin(plugin_name="logger_test"),
+        configure_child_process_logger=configure_logger_fn,
+    )
+
+    plugin.run(log_messages=LOG_MESSAGES)
+
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)

@@ -6,7 +6,19 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
-## [v0.2.0]
+## [v0.3.0] - 2022-12-14
+### Added
+- serpentarium.types
+- serpentarium.types.ConfigureLoggerCallback
+
+### Changed
+- Logger configuration callback can be passed to `PluginLoader's` constructor
+  and overridden by `PluginLoader.load_multiprocessing_plugin()`
+
+### Fixed
+- Explicitly close `MultiprocessingPlugin._receiver()` when done
+
+## [v0.2.0] - 2022-12-12
 ### Added
 - py.typed
 - serpentarium.logging
