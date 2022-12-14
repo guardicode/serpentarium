@@ -7,6 +7,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
 ## [v0.3.0]
+### Added
+- serpentarium.types
+- serpentarium.types.ConfigureLoggerCallback
+
 ### Changed
 - Logger configuration callback can be passed to `PluginLoader's` constructor
   and overridden by `PluginLoader.load_multiprocessing_plugin()`
