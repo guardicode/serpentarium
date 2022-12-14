@@ -32,6 +32,8 @@ class PluginLoader:
         :param plugin_name: The name of the plugin (corresponds to the name of the directory where
                             the plugin is stored)
         :param kwargs: Keyword arguments to be passed to the plugin's constructor
+
+        :return: A MultiUsePlugin
         """
         return PluginWrapper(
             plugin_name=plugin_name,
