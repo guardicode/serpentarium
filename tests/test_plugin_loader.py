@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from serpentarium import PluginLoader
-from tests.logging_utils import get_logger_config_callback
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 
 PLUGIN_DIR = Path(__file__).parent / "plugins"
 MY_PARAM = "test_param"
@@ -80,11 +80,7 @@ def test_child_process_logger_configuration():
     plugin = plugin_loader.load_multiprocessing_plugin(plugin_name="logger")
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
 
 
 def test_child_process_logger_configuration__override():
@@ -99,8 +95,4 @@ def test_child_process_logger_configuration__override():
     plugin.run(log_messages=LOG_MESSAGES)
 
     assert default_ipc_queue.empty()
-    assert not override_ipc_queue.empty()
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert override_ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert override_ipc_queue.empty()
+    assert_queue_equals(override_ipc_queue, LOG_MESSAGES)

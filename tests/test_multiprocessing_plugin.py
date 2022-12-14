@@ -11,7 +11,7 @@ from serpentarium import (
     SingleUsePlugin,
     concurrency,
 )
-from tests.logging_utils import get_logger_config_callback
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 from tests.plugins.logger.plugin import Plugin as LoggerPlugin
 
 LOG_MESSAGES = [
@@ -156,8 +156,4 @@ def test_child_process_logger_configuration():
 
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)

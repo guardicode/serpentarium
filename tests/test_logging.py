@@ -5,7 +5,7 @@ from typing import Iterable, Tuple
 
 from serpentarium.logging import configure_host_process_logger
 from serpentarium.types import ConfigureLoggerCallback as ConfigureLoggerCallback
-from tests.logging_utils import get_logger_config_callback
+from tests.logging_utils import assert_queue_equals, get_logger_config_callback
 
 LOG_MESSAGES = [
     (logging.DEBUG, "log1"),
@@ -34,12 +34,7 @@ def test_child_process_logger__level_notset():
     proc.start()
     proc.join(0.15)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[0][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES)
 
 
 def test_child_process_logger__level_warning():
@@ -49,10 +44,7 @@ def test_child_process_logger__level_warning():
     proc.start()
     proc.join(0.15)
 
-    assert not ipc_queue.empty()
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-    assert ipc_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-    assert ipc_queue.empty()
+    assert_queue_equals(ipc_queue, LOG_MESSAGES[2:])
 
 
 def test_configure_queue_listener():
@@ -71,8 +63,5 @@ def test_configure_queue_listener():
     finally:
         queue_listener.stop()
 
-        assert not test_queue.empty()
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[1][1]
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[2][1]
-        assert test_queue.get_nowait().msg == LOG_MESSAGES[3][1]
-        assert test_queue.empty()
+    assert ipc_queue.empty()
+    assert_queue_equals(test_queue, LOG_MESSAGES[1:])
