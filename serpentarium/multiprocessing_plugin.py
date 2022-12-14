@@ -126,4 +126,9 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
 
     @property
     def return_value(self) -> Any:
+        """
+        The return value of the plugin
+
+        This property will be `None` until the plugin finishes running.
+        """
         return self._return_value
