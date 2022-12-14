@@ -47,6 +47,22 @@ class PluginLoader:
         configure_child_process_logger: Optional[ConfigureLoggerCallback] = None,
         **kwargs,
     ) -> MultiprocessingPlugin:
+        """
+        Load a MultiprocessingPlugin by name
+
+        :param plugin_name: The name of the plugin (corresponds to the name of the directory where
+                            the plugin is stored)
+        :param main_thread_name: The desired name of the child process's main thread. This is useful
+                                 when analyzing logs for applications that are both multi-threaded
+                                 and use MultiprocessingPlugins, defaults to "MainThread"
+        :param configure_child_process_logger: A callback to configure logging on the child process.
+                                               This overrides the callback provided to the
+                                               constructor. Defaults to `None`
+        :param kwargs: Keyword arguments to be passed to the plugin's constructor
+
+        :return: A MultiprocessingPlugin
+        """
+
         plugin = PluginWrapper(
             plugin_name=plugin_name,
             plugin_directory=self._plugin_directory / plugin_name,
