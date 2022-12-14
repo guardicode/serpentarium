@@ -89,6 +89,7 @@ def test_join_timeout(interrupt: concurrency.Event, blocking_plugin: Multiproces
 
     assert blocking_plugin.is_alive()
     interrupt.set()
+    blocking_plugin.join()
 
 
 def test_is_alive__process_not_started():
