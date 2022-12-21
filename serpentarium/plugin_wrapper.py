@@ -46,14 +46,25 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         4. yield
         5. Restore the state of the import system.
         """
-        host_process_sys_modules = sys.modules.copy()
+        with self._clean_system_modules():
+            with self._plugin_import_path():
+                yield
 
-        PluginWrapper._set_sys_modules(CLEAN_SYS_MODULES)
+    @contextlib.contextmanager
+    def _plugin_import_path(self):
         sys.path = [str(self._plugin_directory.parent), str(self._vendor_directory), *sys.path]
 
         yield
 
         sys.path = sys.path[2:]
+
+    @contextlib.contextmanager
+    def _clean_system_modules(self):
+        host_process_sys_modules = sys.modules.copy()
+        PluginWrapper._set_sys_modules(CLEAN_SYS_MODULES)
+
+        yield
+
         PluginWrapper._set_sys_modules(host_process_sys_modules)
 
     @staticmethod
