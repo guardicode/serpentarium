@@ -18,12 +18,20 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
     by this component and the plugin.
     """
 
-    def __init__(self, *, plugin_name: str, plugin_directory: Path, **kwargs):
+    def __init__(
+        self,
+        *,
+        plugin_name: str,
+        plugin_directory: Path,
+        reset_modules_cache: bool = True,
+        **kwargs,
+    ):
         super().__init__(plugin_name=plugin_name)
 
         self._plugin_directory = plugin_directory
         self._vendor_directory = self._plugin_directory / VENDOR_DIRECTORY_NAME
         self.plugin: Optional[MultiUsePlugin] = None
+        self._reset_modules_cache = reset_modules_cache
 
         self._constructor_kwargs = kwargs
 
@@ -46,17 +54,14 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         4. yield
         5. Restore the state of the import system.
         """
-        with self._clean_system_modules():
+
+        if self._reset_modules_cache:
+            with self._clean_system_modules():
+                with self._plugin_import_path():
+                    yield
+        else:
             with self._plugin_import_path():
                 yield
-
-    @contextlib.contextmanager
-    def _plugin_import_path(self):
-        sys.path = [str(self._plugin_directory.parent), str(self._vendor_directory), *sys.path]
-
-        yield
-
-        sys.path = sys.path[2:]
 
     @contextlib.contextmanager
     def _clean_system_modules(self):
@@ -66,6 +71,14 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         yield
 
         PluginWrapper._set_sys_modules(host_process_sys_modules)
+
+    @contextlib.contextmanager
+    def _plugin_import_path(self):
+        sys.path = [str(self._plugin_directory.parent), str(self._vendor_directory), *sys.path]
+
+        yield
+
+        sys.path = sys.path[2:]
 
     @staticmethod
     def _set_sys_modules(modules: Dict[str, ModuleType]):

@@ -59,8 +59,12 @@ def test_multiprocessing_plugin_isolation(plugin_loader: PluginLoader):
 
     Manual testing passes. This will need more investigating to get it to pass as an automated test
     """
-    plugin1 = plugin_loader.load_multiprocessing_plugin(plugin_name="plugin1")
-    plugin2 = plugin_loader.load_multiprocessing_plugin(plugin_name="plugin2")
+    plugin1 = plugin_loader.load_multiprocessing_plugin(
+        plugin_name="plugin1", reset_modules_cache=False
+    )
+    plugin2 = plugin_loader.load_multiprocessing_plugin(
+        plugin_name="plugin2", reset_modules_cache=False
+    )
 
     assert "Tweedledee" in plugin1.run()
     assert "Tweedledum" in plugin2.run()
@@ -77,7 +81,9 @@ def test_child_process_logger_configuration():
     _, ipc_queue, configure_logger_fn = get_logger_config_callback()
     plugin_loader = PluginLoader(PLUGIN_DIR, configure_logger_fn)
 
-    plugin = plugin_loader.load_multiprocessing_plugin(plugin_name="logger")
+    plugin = plugin_loader.load_multiprocessing_plugin(
+        plugin_name="logger", reset_modules_cache=False
+    )
     plugin.run(log_messages=LOG_MESSAGES)
 
     assert_queue_equals(ipc_queue, LOG_MESSAGES)
@@ -90,7 +96,9 @@ def test_child_process_logger_configuration__override():
     _, override_ipc_queue, override_configure_logger_fn = get_logger_config_callback()
 
     plugin = plugin_loader.load_multiprocessing_plugin(
-        plugin_name="logger", configure_child_process_logger=override_configure_logger_fn
+        plugin_name="logger",
+        configure_child_process_logger=override_configure_logger_fn,
+        reset_modules_cache=False,
     )
     plugin.run(log_messages=LOG_MESSAGES)
 
