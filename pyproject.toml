@@ -28,7 +28,7 @@ paths = ["serpentarium"]
 
 [tool.poetry]
 name = "serpentarium"
-version = "0.3.0"
+version = "0.4.0"
 description = "A Python framework for running plugins with conflicting dependencies"
 authors = ["Mike Salvatore <mike.s.salvatore@gmail.com>"]
 license = "GPLv3"

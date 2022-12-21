@@ -6,6 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
+## [v0.4.0] - 2022-12-21
+## Added
+- `reset_modules_cache` option to `PluginLoader.load()`
+- `reset_modules_cache` option to `PluginLoader.load_multiprocessing_plugin()`
+
 ## [v0.3.0] - 2022-12-14
 ### Added
 - serpentarium.types

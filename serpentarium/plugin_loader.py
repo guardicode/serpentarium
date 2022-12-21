@@ -25,12 +25,21 @@ class PluginLoader:
         self._plugin_directory = plugin_directory
         self._configure_child_process_logger = configure_child_process_logger
 
-    def load(self, *, plugin_name: str, **kwargs) -> MultiUsePlugin:
+    def load(
+        self, *, plugin_name: str, reset_modules_cache: bool = True, **kwargs
+    ) -> MultiUsePlugin:
         """
         Load a plugin by name
 
+        Reseting `sys.modules` does not work properly if extension modules have been loaded. The
+        `reset_modules_cache` option gives the caller the ability to disable this behavior.
+
         :param plugin_name: The name of the plugin (corresponds to the name of the directory where
                             the plugin is stored)
+        :param reset_modules_cache: Whether or not to reset the `sys.modules` cache to system
+                                    defaults before executing the plugin. Setting this to `False`
+                                    will break plugin isolation for these plugins. Defaults to
+                                    `True`.
         :param kwargs: Keyword arguments to be passed to the plugin's constructor
 
         :return: A MultiUsePlugin
@@ -38,6 +47,7 @@ class PluginLoader:
         return PluginWrapper(
             plugin_name=plugin_name,
             plugin_directory=self._plugin_directory / plugin_name,
+            reset_modules_cache=reset_modules_cache,
             **kwargs,
         )
 
@@ -47,10 +57,14 @@ class PluginLoader:
         plugin_name: str,
         main_thread_name: str = "MainThread",
         configure_child_process_logger: Optional[ConfigureLoggerCallback] = None,
+        reset_modules_cache=True,
         **kwargs,
     ) -> MultiprocessingPlugin:
         """
         Load a MultiprocessingPlugin by name
+
+        Reseting `sys.modules` does not work properly if extension modules have been loaded. The
+        `reset_modules_cache` option gives the caller the ability to disable this behavior.
 
         :param plugin_name: The name of the plugin (corresponds to the name of the directory where
                             the plugin is stored)
@@ -60,14 +74,19 @@ class PluginLoader:
         :param configure_child_process_logger: A callback to configure logging on the child process.
                                                This overrides the callback provided to the
                                                constructor. Defaults to `None`
+        :param reset_modules_cache: Whether or not to reset the `sys.modules` cache to system
+                                    defaults before executing the plugin. Setting this to `False`
+                                    will have little to no effect in most cases since
+                                    `MultiprocessingPlugins` use the "spawn" method. Defaults to
+                                    `True`.
         :param kwargs: Keyword arguments to be passed to the plugin's constructor
 
         :return: A MultiprocessingPlugin
         """
-
         plugin = PluginWrapper(
             plugin_name=plugin_name,
             plugin_directory=self._plugin_directory / plugin_name,
+            reset_modules_cache=reset_modules_cache,
             **kwargs,
         )
 
