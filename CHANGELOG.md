@@ -6,6 +6,12 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
+## [v0.5.0] - 2022-12-22
+### Added
+- `PluginThreadName` enum
+### Changed
+- `main_thread_name` parameter to accept `Union[PluginThreadName|str]`
+
 ## [v0.4.0] - 2022-12-21
 ## Added
 - `reset_modules_cache` option to `PluginLoader.load()`
