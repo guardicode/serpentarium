@@ -13,7 +13,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 - `main_thread_name` parameter to accept `Union[PluginThreadName|str]`
 
 ## [v0.4.0] - 2022-12-21
-## Added
+### Added
 - `reset_modules_cache` option to `PluginLoader.load()`
 - `reset_modules_cache` option to `PluginLoader.load_multiprocessing_plugin()`
 
