@@ -6,10 +6,18 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
+## [v0.5.0] - 2022-12-22
+### Added
+- `PluginThreadName` enum
+### Changed
+- `main_thread_name` parameter to accept `Union[PluginThreadName|str]`
+
+
 ## [v0.4.0] - 2022-12-21
-## Added
+### Added
 - `reset_modules_cache` option to `PluginLoader.load()`
 - `reset_modules_cache` option to `PluginLoader.load_multiprocessing_plugin()`
+
 
 ## [v0.3.0] - 2022-12-14
 ### Added
@@ -22,6 +30,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
 ### Fixed
 - Explicitly close `MultiprocessingPlugin._receiver()` when done
+
 
 ## [v0.2.0] - 2022-12-12
 ### Added
@@ -38,6 +47,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 ### Fixed
 - The Alpha status classifier
 - MultiprocessingPlugin's violation of the Liskov Substitution Principle
+
 
 ## [v0.1.0] - 2022-12-10
 ### Added

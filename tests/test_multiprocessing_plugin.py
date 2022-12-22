@@ -8,6 +8,7 @@ from serpentarium import (
     MultiprocessingPlugin,
     MultiUsePlugin,
     NamedPluginMixin,
+    PluginThreadName,
     SingleUsePlugin,
     concurrency,
 )
@@ -126,10 +127,13 @@ def test_plugin_raises_exception():
 
 class MainThreadNamePlugin(NamedPluginMixin, MultiUsePlugin):
     def run(self, **_):
+        logging.getLogger().error("23412341234")
+        logging.getLogger().error(threading.current_thread().name)
+        logging.getLogger().error("23412341234")
         return threading.current_thread().name
 
 
-def test_main_thread_name_set():
+def test_main_thread_name__set_custom():
     plugin_thread_name = "Sesame"
     plugin = MultiprocessingPlugin(
         plugin=MainThreadNamePlugin(plugin_name="test"), main_thread_name=plugin_thread_name
@@ -138,6 +142,45 @@ def test_main_thread_name_set():
     return_value = plugin.run()
 
     assert return_value == plugin_thread_name
+
+
+def test_main_thread_name__default():
+    plugin = MultiprocessingPlugin(plugin=MainThreadNamePlugin(plugin_name="test"))
+
+    return_value = plugin.run()
+
+    assert return_value == "MainThread"
+
+
+def test_main_thread_name__explicit_default():
+    plugin = MultiprocessingPlugin(
+        plugin=MainThreadNamePlugin(plugin_name="test"), main_thread_name=PluginThreadName.DEFAULT
+    )
+
+    return_value = plugin.run()
+
+    assert return_value == "MainThread"
+
+
+def test_main_thread_name__calling_thread():
+    return_value = None
+
+    def run_plugin(plugin: MultiprocessingPlugin):
+        nonlocal return_value
+        return_value = plugin.run()
+
+    thread_name = "TestThreadName"
+    plugin = MultiprocessingPlugin(
+        plugin=MainThreadNamePlugin(plugin_name="test"),
+        main_thread_name=PluginThreadName.CALLING_THREAD,
+    )
+
+    thread = threading.Thread(name=thread_name, target=run_plugin, args=(plugin,), daemon=True)
+    thread.start()
+    thread.join(0.1)
+    assert not thread.is_alive()
+
+    assert return_value == thread_name
 
 
 LOG_MESSAGES = [
