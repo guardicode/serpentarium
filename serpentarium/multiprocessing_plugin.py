@@ -1,9 +1,9 @@
 import logging
 import multiprocessing
 from threading import current_thread
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
-from . import NamedPluginMixin, SingleUsePlugin
+from . import NamedPluginMixin, PluginThreadName, SingleUsePlugin
 from .constants import SERPENTARIUM
 from .nop import NOP
 from .types import ConfigureLoggerCallback as ConfigureLoggerCallback
@@ -20,14 +20,25 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         self,
         *,
         plugin: SingleUsePlugin,
-        main_thread_name: str = "MainThread",
+        main_thread_name: Union[PluginThreadName, str] = PluginThreadName.DEFAULT,
         daemon: bool = False,
         configure_child_process_logger: ConfigureLoggerCallback = NOP,
         **kwargs,
     ):
         """
         :param plugin: A Plugin to run in a separate process
-        :param main_thread_name: The name of the process's main thread, defaults to "MainThread"
+        :param main_thread_name: The name of the child process's main thread. This can either be a
+                                 `PluginThreadName` or a string. If it is
+                                 `PluginThreadName.DEFAULT`, then child process's main thread will
+                                 be whatever the interpreter's default main thread name is. If it is
+                                 `PluginThreadName.CALLING_THREAD`, then the child process's main
+                                 thread name will match the name of the thread that calls `run()` on
+                                 this plugin. If it is a string, the child process's main thread
+                                 name will be set to the string value.
+
+                                 Setting this is useful when analyzing logs for applications that
+                                 are both multi-threaded and use `MultiprocessingPlugins`, defaults
+                                 to `PluginThreadName.DEFAULT`.
         :param daemon: Whether or not the process should be a daemon process
         :param configure_child_process_logger: A callable that will be run on the child process to
                                                confirgure concurrent logging
@@ -42,6 +53,7 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         self._receiver, self._sender = multiprocessing.Pipe(duplex=False)
 
         self._proc = None
+        self._calling_thread_name = None
         self._return_value = None
 
     def run(self, *, timeout: Optional[float] = None, **kwargs) -> Any:
@@ -64,17 +76,28 @@ class MultiprocessingPlugin(NamedPluginMixin, SingleUsePlugin):
         """
         Launch a new process that runs this plugin
         """
+        self._calling_thread_name = current_thread().name
+
         self._proc = self._multiprocessing_context.Process(
             name=self.name, daemon=self._daemon, target=self._run, kwargs=kwargs
         )
         self._proc.start()
 
     def _run(self, **kwargs):
-        current_thread().name = self._main_thread_name
+        self._set_main_thread_name()
         self._configure_child_process_logger()
 
         return_value = self._plugin.run(**kwargs)
         self._sender.send(return_value)
+
+    def _set_main_thread_name(self):
+        if self._main_thread_name == PluginThreadName.DEFAULT:
+            # Do nothing, since the process's main thread will be the interpreter's default
+            pass
+        elif self._main_thread_name == PluginThreadName.CALLING_THREAD:
+            current_thread().name = self._calling_thread_name
+        else:
+            current_thread().name = self._main_thread_name
 
     def join(self, timeout: Optional[float] = None):
         """

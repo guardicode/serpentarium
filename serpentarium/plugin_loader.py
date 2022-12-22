@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
-from . import MultiprocessingPlugin, MultiUsePlugin
+from . import MultiprocessingPlugin, MultiUsePlugin, PluginThreadName
 from .nop import NOP
 from .plugin_wrapper import PluginWrapper
 from .types import ConfigureLoggerCallback as ConfigureLoggerCallback
@@ -55,7 +55,7 @@ class PluginLoader:
         self,
         *,
         plugin_name: str,
-        main_thread_name: str = "MainThread",
+        main_thread_name: Union[PluginThreadName, str] = PluginThreadName.DEFAULT,
         configure_child_process_logger: Optional[ConfigureLoggerCallback] = None,
         reset_modules_cache=True,
         **kwargs,
@@ -68,9 +68,18 @@ class PluginLoader:
 
         :param plugin_name: The name of the plugin (corresponds to the name of the directory where
                             the plugin is stored)
-        :param main_thread_name: The desired name of the child process's main thread. This is useful
-                                 when analyzing logs for applications that are both multi-threaded
-                                 and use MultiprocessingPlugins, defaults to "MainThread"
+        :param main_thread_name: The name of the child process's main thread. This can either be a
+                                 `PluginThreadName` or a string. If it is
+                                 `PluginThreadName.DEFAULT`, then child process's main thread will
+                                 be whatever the interpreter's default main thread name is. If it is
+                                 `PluginThreadName.CALLING_THREAD`, then the child process's main
+                                 thread name will match the name of the thread that calls `run()` on
+                                 this plugin. If it is a string, the child process's main thread
+                                 name will be set to the string value.
+
+                                 Setting this is useful when analyzing logs for applications that
+                                 are both multi-threaded and use `MultiprocessingPlugins`, defaults
+                                 to `PluginThreadName.DEFAULT`.
         :param configure_child_process_logger: A callback to configure logging on the child process.
                                                This overrides the callback provided to the
                                                constructor. Defaults to `None`
