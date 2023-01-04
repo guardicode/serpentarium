@@ -191,7 +191,7 @@ LOG_MESSAGES = [
 
 
 def test_child_process_logger_configuration():
-    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
+    _, ipc_logger_queue, configure_logger_fn = get_logger_config_callback()
 
     plugin = MultiprocessingPlugin(
         plugin=LoggerPlugin(plugin_name="logger_test"),
@@ -200,4 +200,4 @@ def test_child_process_logger_configuration():
 
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert_queue_equals(ipc_queue, LOG_MESSAGES)
+    assert_queue_equals(ipc_logger_queue, LOG_MESSAGES)

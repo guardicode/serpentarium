@@ -13,10 +13,10 @@ def get_logger_config_callback(
     log_level=logging.NOTSET,
 ) -> Tuple[multiprocessing.context.SpawnContext, multiprocessing.Queue, ConfigureLoggerCallback]:
     spawn_context = multiprocessing.get_context("spawn")
-    ipc_queue = spawn_context.Queue()
-    configure_logger_fn = partial(configure_child_process_logger, ipc_queue, log_level)
+    ipc_logger_queue = spawn_context.Queue()
+    configure_logger_fn = partial(configure_child_process_logger, ipc_logger_queue, log_level)
 
-    return (spawn_context, ipc_queue, configure_logger_fn)
+    return (spawn_context, ipc_logger_queue, configure_logger_fn)
 
 
 def assert_queue_equals(queue: Queue[logging.LogRecord], expected: Iterable[Tuple[int, str]]):

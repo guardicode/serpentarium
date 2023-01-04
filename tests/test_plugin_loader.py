@@ -78,7 +78,7 @@ LOG_MESSAGES = [
 
 
 def test_child_process_logger_configuration():
-    _, ipc_queue, configure_logger_fn = get_logger_config_callback()
+    _, ipc_logger_queue, configure_logger_fn = get_logger_config_callback()
     plugin_loader = PluginLoader(PLUGIN_DIR, configure_logger_fn)
 
     plugin = plugin_loader.load_multiprocessing_plugin(
@@ -86,14 +86,14 @@ def test_child_process_logger_configuration():
     )
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert_queue_equals(ipc_queue, LOG_MESSAGES)
+    assert_queue_equals(ipc_logger_queue, LOG_MESSAGES)
 
 
 def test_child_process_logger_configuration__override():
-    _, default_ipc_queue, default_configure_logger_fn = get_logger_config_callback()
+    _, default_ipc_logger_queue, default_configure_logger_fn = get_logger_config_callback()
     plugin_loader = PluginLoader(PLUGIN_DIR, default_configure_logger_fn)
 
-    _, override_ipc_queue, override_configure_logger_fn = get_logger_config_callback()
+    _, override_ipc_logger_queue, override_configure_logger_fn = get_logger_config_callback()
 
     plugin = plugin_loader.load_multiprocessing_plugin(
         plugin_name="logger",
@@ -102,5 +102,5 @@ def test_child_process_logger_configuration__override():
     )
     plugin.run(log_messages=LOG_MESSAGES)
 
-    assert default_ipc_queue.empty()
-    assert_queue_equals(override_ipc_queue, LOG_MESSAGES)
+    assert default_ipc_logger_queue.empty()
+    assert_queue_equals(override_ipc_logger_queue, LOG_MESSAGES)
