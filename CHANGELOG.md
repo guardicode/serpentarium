@@ -6,6 +6,14 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
+## [v0.6.0] - 2023-01-04
+## Changed
+- The `ipc_queue` argument name to `ipc_logger_queue`
+
+## Fixed
+- Incorrect type hint for serpentarium.logging.configure_host_process_logger()
+
+
 ## [v0.5.0] - 2022-12-22
 ### Added
 - `PluginThreadName` enum
