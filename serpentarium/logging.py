@@ -32,7 +32,7 @@ def configure_child_process_logger(ipc_queue: Queue, level: int = logging.NOTSET
 
 def configure_host_process_logger(
     ipc_queue: Queue,
-    handlers: Sequence[logging.handlers.QueueHandler] = [],
+    handlers: Sequence[logging.Handler] = [],
 ) -> QueueListener:
     """
     Configures the root logger to use a QueueListener
