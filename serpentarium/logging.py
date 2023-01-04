@@ -9,7 +9,7 @@ to a queue which is serviced by a single process.
 import logging
 from logging.handlers import QueueHandler, QueueListener
 from queue import Queue
-from typing import Sequence
+from typing import Collection
 
 
 def configure_child_process_logger(ipc_queue: Queue, level: int = logging.NOTSET):
@@ -32,7 +32,7 @@ def configure_child_process_logger(ipc_queue: Queue, level: int = logging.NOTSET
 
 def configure_host_process_logger(
     ipc_queue: Queue,
-    handlers: Sequence[logging.Handler] = [],
+    handlers: Collection[logging.Handler] = [],
 ) -> QueueListener:
     """
     Configures the root logger to use a QueueListener
@@ -47,8 +47,8 @@ def configure_host_process_logger(
     information about QueueListener
 
     :param ipc_queue: A Queue shared by the host and child process that stores log messages
-    :param handlers: A Sequence of LogHandler objects that the QueueListener will use to handle log
-                     messages it pulls off of the ipc_queue
+    :param handlers: A Collection of LogHandler objects that the QueueListener will use to handle
+                     log messages it pulls off of the ipc_queue
 
     :return: An unstarted QueueListener object
     """
