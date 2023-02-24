@@ -36,6 +36,9 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         self._constructor_kwargs = kwargs
 
     def run(self, **kwargs) -> Any:
+        # After a plugin has been imported and run, it contains references to its own
+        # modules/dependencies. Therefore, we don't need to use `self._plugin_import_context()` in
+        # order to isolate after the initial run.
         if self.plugin is not None:
             return self.plugin.run(**kwargs)
 
