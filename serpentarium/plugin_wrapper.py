@@ -39,8 +39,12 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         if self.plugin is not None:
             return self.plugin.run(**kwargs)
 
+        return self._run_in_isolated_context(**kwargs)
+
+    def _run_in_isolated_context(self, **kwargs) -> Any:
         result = None
         exception = None
+
         with self._plugin_import_context():
             try:
                 self.plugin = self._load_plugin()
