@@ -39,9 +39,20 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
         if self.plugin is not None:
             return self.plugin.run(**kwargs)
 
+        result = None
+        exception_raised = False
         with self._plugin_import_context():
-            self.plugin = self._load_plugin()
-            return self.plugin.run(**kwargs)
+            try:
+                self.plugin = self._load_plugin()
+                result = self.plugin.run(**kwargs)
+            except Exception as ex:
+                exception_raised = True
+                result = ex
+
+        if exception_raised:
+            raise result
+
+        return result
 
     @contextlib.contextmanager
     def _plugin_import_context(self):
