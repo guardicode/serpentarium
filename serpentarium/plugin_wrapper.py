@@ -40,17 +40,16 @@ class PluginWrapper(NamedPluginMixin, MultiUsePlugin):
             return self.plugin.run(**kwargs)
 
         result = None
-        exception_raised = False
+        exception = None
         with self._plugin_import_context():
             try:
                 self.plugin = self._load_plugin()
                 result = self.plugin.run(**kwargs)
             except Exception as ex:
-                exception_raised = True
-                result = ex
+                exception = ex
 
-        if exception_raised:
-            raise result
+        if exception is not None:
+            raise exception
 
         return result
 
