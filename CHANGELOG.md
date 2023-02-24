@@ -6,6 +6,10 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
+## [v0.6.1] - 2023-02-24
+## Fixed
+- A bug that prevented import context from being restored if an exception was raised. #1
+
 ## [v0.6.0] - 2023-01-04
 ## Changed
 - The `ipc_queue` argument name to `ipc_logger_queue`
