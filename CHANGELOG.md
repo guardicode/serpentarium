@@ -6,11 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 
-## [v0.6.1] - 2023-02-24
+## [0.6.1] - 2023-02-24
 ## Fixed
 - A bug that prevented import context from being restored if an exception was raised. #1
 
-## [v0.6.0] - 2023-01-04
+## [0.6.0] - 2023-01-04
 ## Changed
 - The `ipc_queue` argument name to `ipc_logger_queue`
 
@@ -18,20 +18,20 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 - Incorrect type hint for serpentarium.logging.configure_host_process_logger()
 
 
-## [v0.5.0] - 2022-12-22
+## [0.5.0] - 2022-12-22
 ### Added
 - `PluginThreadName` enum
 ### Changed
 - `main_thread_name` parameter to accept `Union[PluginThreadName|str]`
 
 
-## [v0.4.0] - 2022-12-21
+## [0.4.0] - 2022-12-21
 ### Added
 - `reset_modules_cache` option to `PluginLoader.load()`
 - `reset_modules_cache` option to `PluginLoader.load_multiprocessing_plugin()`
 
 
-## [v0.3.0] - 2022-12-14
+## [0.3.0] - 2022-12-14
 ### Added
 - serpentarium.types
 - serpentarium.types.ConfigureLoggerCallback
@@ -44,7 +44,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 - Explicitly close `MultiprocessingPlugin._receiver()` when done
 
 
-## [v0.2.0] - 2022-12-12
+## [0.2.0] - 2022-12-12
 ### Added
 - py.typed
 - serpentarium.logging
@@ -61,7 +61,7 @@ the [PEP 440 version scheme](https://peps.python.org/pep-0440/#version-scheme).
 - MultiprocessingPlugin's violation of the Liskov Substitution Principle
 
 
-## [v0.1.0] - 2022-12-10
+## [0.1.0] - 2022-12-10
 ### Added
 - README.md
 - CHANGELOG.md
